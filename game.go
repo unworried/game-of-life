@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type Game struct {
@@ -25,9 +24,8 @@ func (g *Game) Update() error {
 		}
 
 		ebiten.SetMaxTPS(TPS)
+		fmt.Printf("TPS: %v\nActual TPS: %v\n", TPS, ebiten.CurrentTPS())
 	}
-
-	fmt.Println(ebiten.CurrentTPS(), TPS)
 	return nil
 }
 
@@ -38,7 +36,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.world.Draw(g.pixels)
 	screen.ReplacePixels(g.pixels)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f", ebiten.CurrentTPS(), ebiten.CurrentFPS()))
+	//ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f", ebiten.CurrentTPS(), ebiten.CurrentFPS()))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
