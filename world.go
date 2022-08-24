@@ -1,124 +1,88 @@
 package main
 
-import (
-	"fmt"
-	"image/color"
-	"math/rand"
-	"os"
-	"time"
-
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
-)
+import "math/rand"
 
 type World struct {
-	cells  []Cell
+	area   []bool
 	width  int
 	height int
 }
 
-/*
- x → →
-
- y
- ↓
- ↓
-*/
-
-func NewWorld(width, height int) *World {
-	return &World{
-		cells:  make([]Cell, width*height),
+func NewWorld(width, height int, maxInitLiveCells int) *World {
+	w := &World{
+		area:   make([]bool, width*height),
 		width:  width,
 		height: height,
 	}
+	w.init(maxInitLiveCells)
+	return w
 }
 
-func (wl *World) GenerateGrid(percent int) {
-	percentageAlive := percent * len(wl.cells) / 100
-
-	// Fill Alive Cells as per percentage given
-	for i := percentageAlive; i > 0; i-- {
-		wl.cells[i] = NewCell(true)
+func (w *World) init(maxLiveCells int) {
+	for i := 0; i < maxLiveCells; i++ {
+		x := rand.Intn(w.width)
+		y := rand.Intn(w.height)
+		w.area[y*w.width+x] = true
 	}
-
-	// Randomize Alive Cells
-	cellsClone := wl.cells
-	seed := rand.New(rand.NewSource(time.Now().Unix()))
-	for i := len(wl.cells); i > 0; i-- {
-		randomIndex := seed.Intn(i)
-		wl.cells[i-1], cellsClone[randomIndex] = cellsClone[randomIndex], wl.cells[i-1]
-	}
-	wl.cells = cellsClone
 }
 
-func (wl *World) Next() {
-	oldWorld := NewWorld(wl.width, wl.height)
-	copy(oldWorld.cells, wl.cells)
+func (w *World) Update() {
+	width := w.width
+	height := w.height
+	next := make([]bool, width*height)
+	for y := 0; y < height; y++ {
+		for x := 0; x < width; x++ {
+			pop := neighbourCount(w.area, width, height, x, y)
+			switch {
+			case pop < 2:
+				next[y*width+x] = false
 
-	for y := 0; y < oldWorld.height; y++ {
-		for x := 0; x < oldWorld.width; x++ {
-			cell := NewCell(oldWorld.getCell(x, y))
-			count := oldWorld.findNeighbours(x, y)
-			cell.NextState(count)
-			wl.setCell(x, y, cell.Alive)
+			case (pop == 2 || pop == 3) && w.area[y*width+x]:
+				next[y*width+x] = true
+
+			case pop > 3:
+				next[y*width+x] = false
+
+			case pop == 3:
+				next[y*width+x] = true
+			}
+		}
+	}
+	w.area = next
+}
+
+func (w *World) Draw(pix []byte) {
+	for i, v := range w.area {
+		if v {
+			pix[4*i] = 0xff
+			pix[4*i+1] = 0xff
+			pix[4*i+2] = 0xff
+			pix[4*i+3] = 0xff
+		} else {
+			pix[4*i] = 0
+			pix[4*i+1] = 0
+			pix[4*i+2] = 0
+			pix[4*i+3] = 0
 		}
 	}
 }
 
-// Print to screen
-func (wl World) Print(background *ebiten.Image) {
-	for y := 0; y < wl.height; y++ {
-		//columns
-		for x := 0; x < wl.width; x++ {
-			renderCharacter(x, y, wl.getCell(x, y), background)
+func neighbourCount(a []bool, width, height, x, y int) int {
+	c := 0
+	for j := -1; j <= 1; j++ {
+		for i := -1; i <= 1; i++ {
+			if i == 0 && j == 0 {
+				continue
+			}
+			x2 := x + i
+			y2 := y + j
+			if x2 < 0 || y2 < 0 || width <= x2 || height <= y2 {
+				continue
+			}
+			if a[y2*width+x2] {
+				c++
+			}
 		}
 	}
-}
-
-func (wl World) isInside(x, y int) bool {
-	return x >= 0 && x < wl.width && y >= 0 && y < wl.height
-}
-
-// Look checks a Cell at given direction
-// and returns true if a Cell is found
-func (wl World) Look(x, y int, dir Vector) bool {
-	if !wl.isInside(x, y) {
-		return false
-	}
-	return wl.Plus(x, y, dir)
-}
-
-func (wl World) getCell(x, y int) bool {
-	return wl.cells[x+(y*wl.width)].Alive
-}
-
-func (wl *World) setCell(x, y int, alive bool) {
-	if !wl.isInside(x, y) {
-		fmt.Printf("Cordinates %v and %v are not in range! \n", x, y)
-		os.Exit(1)
-	}
-
-	wl.cells[x+(y*wl.width)] = NewCell(alive)
-}
-
-// Plus accepts x, y of Cell PLUS direction vector
-// returns if Cell exists in the given direction
-func (wl World) Plus(x, y int, vec Vector) bool {
-	return wl.isInside(x+vec.x, y+vec.y) && wl.getCell(x+vec.x, y+vec.y)
-}
-
-// findNeighbours of given co-ordinates
-func (wl World) findNeighbours(x, y int) (count int) {
-	for _, direction := range DirectionNames {
-		if wl.Look(x, y, Directions[direction]) {
-			count++
-		}
-	}
-	return
-}
-
-func renderCharacter(x, y int, isAlive bool, background *ebiten.Image) {
-	if isAlive {
-		ebitenutil.DrawRect(background, float64(x), float64(y), 1, 1, color.White)
-	}
+	return c
 }
