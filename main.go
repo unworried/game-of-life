@@ -25,7 +25,7 @@ func main() {
 	world = NewWorld(xWidth, yHeight)
 	world.GenerateGrid(alivePercentage)
 
-	if err := ebiten.Run(update, xWidth, yHeight, 2, "Conway's Game of Life"); err != nil {
+	if err := ebiten.Run(update, xWidth, yHeight, 2, "Hello, World!"); err != nil {
 		log.Fatal(err)
 	}
 }

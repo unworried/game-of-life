@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/hajimehoshi/ebiten"
-	"github.com/hajimehoshi/ebiten/ebitenutil"
 	"image/color"
 	"math/rand"
 	"os"
 	"time"
+
+	"github.com/hajimehoshi/ebiten"
+	"github.com/hajimehoshi/ebiten/ebitenutil"
 )
 
 type World struct {
@@ -64,7 +65,7 @@ func (wl *World) Next() {
 	}
 }
 
-//Print to screen
+// Print to screen
 func (wl World) Print(background *ebiten.Image) {
 	for y := 0; y < wl.height; y++ {
 		//columns
