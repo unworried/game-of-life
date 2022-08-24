@@ -13,7 +13,10 @@ const (
 	screenHeight = 320
 )
 
-var pixelColor = []byte{255, 255, 255, 255}
+var (
+	TPS        = 25
+	pixelColor = []byte{255, 255, 255, 255}
+)
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
@@ -21,11 +24,11 @@ func init() {
 
 func main() {
 	g := &Game{
-		world: NewWorld(screenWidth, screenHeight, int((screenWidth*screenHeight)/4)),
+		world: NewWorld(screenWidth, screenHeight, int((screenWidth*screenHeight)/3)),
 	}
 
 	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
-	ebiten.SetMaxTPS(30)
+	ebiten.SetMaxTPS(TPS)
 
 	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
 	ebiten.SetWindowTitle("Game of Life")

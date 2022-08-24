@@ -10,10 +10,24 @@ import (
 type Game struct {
 	world  *World
 	pixels []byte
+	input  *Input
 }
 
 func (g *Game) Update() error {
 	g.world.Update()
+
+	if dir, ok := g.input.Dir(); ok {
+		if Dir.String(dir) == "Left" && TPS != 5 {
+			TPS = TPS - 5
+		}
+		if Dir.String(dir) == "Right" {
+			TPS = TPS + 5
+		}
+
+		ebiten.SetMaxTPS(TPS)
+	}
+
+	fmt.Println(ebiten.CurrentTPS(), TPS)
 	return nil
 }
 
