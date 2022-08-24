@@ -24,7 +24,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	g.world.Draw(g.pixels)
 	screen.ReplacePixels(g.pixels)
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f", ebiten.CurrentFPS()))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f\nFPS: %0.2f", ebiten.CurrentTPS(), ebiten.CurrentFPS()))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {

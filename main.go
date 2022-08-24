@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math/rand"
 	"time"
@@ -25,7 +24,8 @@ func main() {
 		world: NewWorld(screenWidth, screenHeight, int((screenWidth*screenHeight)/4)),
 	}
 
-	fmt.Println(pixelColor)
+	ebiten.SetFPSMode(ebiten.FPSModeVsyncOffMaximum)
+	ebiten.SetMaxTPS(30)
 
 	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
 	ebiten.SetWindowTitle("Game of Life")
