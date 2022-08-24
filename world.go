@@ -30,6 +30,7 @@ func (w *World) Update() {
 	width := w.width
 	height := w.height
 	next := make([]bool, width*height)
+
 	for y := 0; y < height; y++ {
 		for x := 0; x < width; x++ {
 			pop := neighbourCount(w.area, width, height, x, y)
@@ -54,10 +55,10 @@ func (w *World) Update() {
 func (w *World) Draw(pix []byte) {
 	for i, v := range w.area {
 		if v {
-			pix[4*i] = 0xff
-			pix[4*i+1] = 0xff
-			pix[4*i+2] = 0xff
-			pix[4*i+3] = 0xff
+			pix[4*i] = pixelColor[0]
+			pix[4*i+1] = pixelColor[1]
+			pix[4*i+2] = pixelColor[2]
+			pix[4*i+3] = pixelColor[3]
 		} else {
 			pix[4*i] = 0
 			pix[4*i+1] = 0

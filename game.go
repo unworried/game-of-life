@@ -1,6 +1,11 @@
 package main
 
-import "github.com/hajimehoshi/ebiten/v2"
+import (
+	"fmt"
+
+	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+)
 
 type Game struct {
 	world  *World
@@ -18,6 +23,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 	g.world.Draw(g.pixels)
 	screen.ReplacePixels(g.pixels)
+
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("FPS: %0.2f", ebiten.CurrentFPS()))
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
